@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taxpayer Ads Analysis</title>
+<style>
+:root{--bg:#fff;--fg:#1b1f27;--mut:#5b6472;--card:#f6f8fc;--bd:#dfe4ec;--trk:#e6e9ef;--hdr:linear-gradient(90deg,#0066cc,#7a3dd7,#e24a3b);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151b;--fg:#e8ebf0;--mut:#9aa4b2;--card:#1b2029;--bd:#2c3340;--trk:#2a303b}}
+:root[data-theme="dark"]{--bg:#12151b;--fg:#e8ebf0;--mut:#9aa4b2;--card:#1b2029;--bd:#2c3340;--trk:#2a303b}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);font:16px/1.65 Georgia,"Times New Roman",serif}
+.top{background:var(--hdr);color:#fff;font:700 15px/1 Arial,Helvetica,sans-serif;padding:14px 16px}
+.wrap{max-width:940px;margin:0 auto;padding:8px 14px 40px}
+h1{font:700 1.7em/1.25 Arial,Helvetica,sans-serif;margin:22px 0 4px}
+.date{color:var(--mut);font:14px Arial,Helvetica,sans-serif;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin:14px 0}
+.hdr{background:var(--hdr);color:#fff;font:700 15px Arial,Helvetica,sans-serif;padding:9px 12px;margin:-12px -14px 12px;border-radius:11px 11px 0 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{color:#fff;border-radius:14px;padding:4px 11px;font:700 13px Arial,Helvetica,sans-serif}
+details{margin-top:10px}summary{cursor:pointer;font:700 14px Arial,Helvetica,sans-serif;padding:8px 10px;border-radius:8px;background:var(--trk)}
+details>div,details>ul{padding:8px 4px}
+.fc{border-top:1px solid var(--bd);padding:10px 0}.fc:first-child{border-top:0}
+.fc b{font-family:Arial,Helvetica,sans-serif}.sm{color:var(--mut);font-size:.9em;margin:2px 0}
+.v{display:inline-block;color:#fff;border-radius:6px;padding:2px 9px;font:700 13px Arial,Helvetica,sans-serif;margin:4px 0}
+.row{display:grid;grid-template-columns:110px 1fr 44px;gap:10px;align-items:center;margin:7px 0;font:14px Arial,Helvetica,sans-serif}
+.trk{position:relative;height:18px;border-radius:7px;overflow:hidden;background:var(--trk)}
+.grad{position:absolute;inset:0;background:linear-gradient(90deg,#E24A3B 0%,#F39C3D 45%,#E6C84A 75%,#66B56F 90%,#144C22 100%)}
+.cov{position:absolute;top:0;right:0;height:100%;background:var(--trk)}
+.scroll{overflow-x:auto}table{border-collapse:separate;border-spacing:4px;width:100%;table-layout:fixed;font:13px Arial,Helvetica,sans-serif}
+th{text-align:center;color:var(--mut);padding:4px}th:first-child,td:first-child{text-align:left;font-weight:700;white-space:normal;width:21%}
+.cell{display:block;width:100%;min-width:0;border:2px solid transparent;border-radius:8px;padding:8px 6px;color:#111;cursor:pointer;font:inherit;text-align:center}
+.cell:hover,.cell[aria-pressed=true]{border-color:var(--fg)}.cell b{font-size:1.25em;display:block}
+.panel{margin-top:8px;padding:10px 12px;border-left:4px solid #7a3dd7;background:var(--bg);border-radius:6px;font:14px/1.5 Arial,Helvetica,sans-serif}
+svg{width:100%;height:auto;display:block}svg text{fill:var(--mut);font:12px Arial,Helvetica,sans-serif}svg.bm text{font-size:24px}
+.dq{display:flex;gap:10px;margin:8px 0;font-size:.95em}.dn{flex:0 0 26px;height:26px;border:2px solid #2b5ea7;border-radius:50%;display:grid;place-items:center;font:700 12px Arial,sans-serif;color:#2b5ea7}
+.load textarea{width:100%;min-height:110px;box-sizing:border-box;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:8px;font:12px monospace}
+figure{margin:14px 0}figure img{max-width:100%;border-radius:10px}figcaption{color:var(--mut);font-size:.9em}.vf{border-top:1px solid var(--bd);padding:10px 0}.vf:first-child{border-top:0}.tag{display:inline-block;border-radius:6px;padding:2px 8px;font:700 12px Arial,sans-serif;margin:3px 6px 3px 0;background:var(--trk);color:var(--fg)}
+button.b{background:#0066cc;color:#fff;border:0;border-radius:8px;padding:8px 14px;font:700 14px Arial,sans-serif;cursor:pointer;margin:6px 6px 0 0}
+button.b.g{background:var(--trk);color:var(--fg)}.note{color:var(--mut);font-size:.88em}
+@media (max-width:560px){.cell{font-size:11.5px;padding:7px 2px}th{font-size:11px}.row{grid-template-columns:84px 1fr 38px}h1{font-size:1.35em}}
+</style>
+</head>
+<body>
+<div class="top">News Analysis</div>
+<div class="wrap">
+<div id="out"></div>
+<details class="card load"><summary>Load another analysis</summary>
+<div><p class="note">Paste a v2.6 or v2.7 fragment (blocks wrapped in BEGIN/END comments) or choose a file. Nothing leaves your browser.</p>
+<textarea id="src" aria-label="Analysis fragment"></textarea><br>
+<input type="file" id="file" accept=".html,.htm,.txt">
+<br><button class="b" id="go">Render</button><button class="b g" id="smp">Show sample</button><button class="b g" id="smp2">Visual framing demo</button></div></details>
+</div>
+<script>
+const SAMPLE=`<!-- BEGIN: headline --><div id="headline"><p>Trump Allies Call New Epstein Emails a “Hoax” and “Distraction” as Files Fight Escalates</p></div><!-- END: headline -->
+<!-- BEGIN: coverage-date --><div id="coverage-date"><p>November 14, 2025</p></div><!-- END: coverage-date -->
+<!-- BEGIN: nr-body --><div id="nr-body"><p>(Abridged sample.) House Democrats released a new tranche of documents from Jeffrey Epstein’s estate, including emails in which Epstein claimed Donald Trump “spent hours” at his home with one of his victims. The messages do not amount to criminal charges or a formal finding of wrongdoing.</p><p>Press secretary Karoline Leavitt accused Democrats of leaking the emails selectively, and Trump called the renewed focus a “Jeffrey Epstein Hoax.” Republicans on the House Oversight Committee then released a far larger set of documents.</p></div><!-- END: nr-body -->
+<!-- BEGIN: outlet-coverage --><div id="outlet-coverage"><ul><li><a href="https://apnews.com">Associated Press</a>: Details Epstein’s claims, balances them with Giuffre’s exculpatory statements, and reports the White House charge of selective leaking.</li></ul></div><!-- END: outlet-coverage -->
+<!-- BEGIN: fc-claims --><div id="fc-claims">
+<p><strong>Claim:</strong> The emails prove Trump knowingly condoned Epstein’s abuse.</p><p><strong>Origin:</strong> Implied in some opinion segments.</p><p><strong>Verdict:</strong> ❓ Unsupported</p><p><em>Rationale:</em> The emails show what Epstein privately claimed but contain no independent corroboration of criminal conduct.</p>
+<p><strong>Claim:</strong> Democrats selectively leaked emails and the full set exonerates Trump.</p><p><strong>Origin:</strong> White House statements and Fox News.</p><p><strong>Verdict:</strong> ⚠️ Misleading</p><p><em>Rationale:</em> The initial release was a subset, but the larger tranche still contains the troubling claims.</p></div><!-- END: fc-claims -->
+<!-- BEGIN: fc-conspiracy --><div id="fc-conspiracy"><p><strong>Claim:</strong> Democrats and “deep state” actors fabricated the emails.</p><p><strong>Source:</strong> Fringe social media posts.</p><p><strong>Verdict:</strong> ❌ False</p><p><em>Rationale:</em> The emails came from Epstein’s estate through congressional channels and were obtained by multiple outlets.</p></div><!-- END: fc-conspiracy -->
+<!-- BEGIN: hypocrisy --><div id="hypocrisy"><p><strong>Baseline (prior statement):</strong> Trump promised transparency on the Epstein files.</p><p><strong>Follow-up (current case):</strong> He now calls scrutiny a “hoax” and resists disclosure efforts.</p><p><strong>Assessment:</strong> Severity 4 — A substantial reversal, partly mitigated by the argument that the core crimes are undisputed.</p></div><!-- END: hypocrisy -->
+<!-- BEGIN: credibility-score --><div id="credibility-score"><script>window.DATA=window.DATA||{};window.DATA.cred={scores:[{outlet:"Reuters",class:"reuters",score:93},{outlet:"AP",class:"ap",score:91},{outlet:"CNN",class:"cnn",score:84},{outlet:"MSNBC",class:"msnbc",score:76},{outlet:"Fox News",class:"fox",score:68},{outlet:"Newsmax",class:"newsmax",score:57}]};<\/script></div><!-- END: credibility-score -->
+<!-- BEGIN: comparative-metrics --><div id="comparative-metrics"><script>window.DATA=window.DATA||{};window.DATA.cm={rows:[{outlet:"Reuters",class:"reuters",spin:"None",silence:"None",distortion:"None",factual:"Excellent"},{outlet:"AP",class:"ap",spin:"None",silence:"None",distortion:"None",factual:"Excellent"},{outlet:"CNN",class:"cnn",spin:"Mild",silence:"Minimal",distortion:"Minimal",factual:"Very Good"},{outlet:"MSNBC",class:"msnbc",spin:"High",silence:"Moderate",distortion:"Moderate",factual:"Good"},{outlet:"Fox News",class:"fox",spin:"High",silence:"High",distortion:"Moderate",factual:"Good"},{outlet:"Newsmax",class:"newsmax",spin:"Severe",silence:"Severe",distortion:"High",factual:"Fair"}],rationales:[
+{id:"reuters",label:"Reuters",rationales:[{metricId:"spin",title:"Spin",criteria:["Strictly descriptive language; no hoax or exoneration terms."]},{metricId:"factual",title:"Factual Integrity",criteria:["Anchored in the email text and on-the-record responses."]},{metricId:"silence",title:"Strategic Silence",criteria:["Includes both Democratic arguments and Republican cherry-picking complaints."]},{metricId:"distortion",title:"Media Distortion",criteria:["No distortion detected; framing stays wire-neutral."]}]},
+{id:"msnbc",label:"MSNBC",rationales:[{metricId:"spin",title:"Spin",criteria:["Hosts treat the emails as morally explosive."]},{metricId:"factual",title:"Factual Integrity",criteria:["Quotes are accurate but embedded in sweeping character judgments."]},{metricId:"silence",title:"Strategic Silence",criteria:["Giuffre’s defense of Trump gets comparatively little airtime."]},{metricId:"distortion",title:"Media Distortion",criteria:["Blurs Epstein’s beliefs with established facts."]}]}]};<\/script></div><!-- END: comparative-metrics -->
+<!-- BEGIN: window.DATA.drift --><script type="application/json" id="drift-data">{"focus_actor":"Donald Trump","add_baseline":true,"baseline_quote":"Promised to open the Epstein files so the public could see everything.","points":[{"quote":"Labeled the controversy the “Jeffrey Epstein Hoax” and urged supporters not to waste time on it.","degree":95},{"quote":"Resisted efforts to force full file disclosure.","degree":90}]}<\/script><!-- END: window.DATA.drift -->
+<!-- BEGIN: bias-map --><div id="bias-map"><script>window.DATA=window.DATA||{};window.DATA.bias={lean_min:-10,lean_max:10,str_min:0,str_max:5,outlets:[{name:"Reuters",class:"reuters",lean:-0.5,strength:0.6},{name:"AP",class:"ap",lean:-0.8,strength:0.7},{name:"CNN",class:"cnn",lean:-2.2,strength:1.3},{name:"MSNBC",class:"msnbc",lean:-4.0,strength:1.9},{name:"Fox News",class:"fox",lean:3.5,strength:1.8},{name:"Newsmax",class:"newsmax",lean:5.5,strength:2.2}]};<\/script></div><!-- END: bias-map -->
+<!-- BEGIN: bias-notes --><div id="bias-notes"><ul><li>Fox News: Focuses on Democratic tactics and the timing of the leak, steering attention away from unresolved questions in the emails.</li></ul></div><!-- END: bias-notes -->
+<!-- BEGIN: imagery --><div id="imagery"><script>window.DATA=window.DATA||{};window.DATA.imagery={records:[{outlet:"Reuters",class:"reuters",evidence:"not_reviewed"},{outlet:"AP",class:"ap",evidence:"not_reviewed"},{outlet:"CNN",class:"cnn",evidence:"not_reviewed"},{outlet:"MSNBC",class:"msnbc",evidence:"not_reviewed"},{outlet:"Fox News",class:"fox",evidence:"not_reviewed"},{outlet:"Newsmax",class:"newsmax",evidence:"not_reviewed"}]};<\/script></div><!-- END: imagery -->
+<p><em>Note: Allegations summarized above reflect statements in documents, media reports, and political commentary and have not been adjudicated in court.</em></p>`;
+const SAMPLE2=`<!-- BEGIN: headline --><div id="headline"><p>Visual framing demo: coverage of Tennessee’s failed execution of Christa Pike</p></div><!-- END: headline -->
+<!-- BEGIN: coverage-date --><div id="coverage-date"><p>October 1, 2026</p></div><!-- END: coverage-date -->
+<!-- BEGIN: imagery --><div id="imagery"><script>window.DATA=window.DATA||{};window.DATA.imagery={records:[{outlet:"AP",class:"ap",evidence:"caption",image_type:"handout_portrait",credit:"Tennessee Department of Correction via AP",caption:"Pike, pictured in 2007, had been scheduled for execution for a 1995 killing."},{outlet:"CBC",class:"cbc",evidence:"caption",image_type:"handout_portrait",credit:"Tennessee Department of Correction/Reuters",caption:"Pike, pictured at age 36, was convicted of killing a classmate in 1995."},{outlet:"NPR",class:"npr",evidence:"caption",image_type:"scene",caption:"Emergency vehicles arrive at Riverbend Maximum Security Institution after the execution was halted."},{outlet:"CNN",class:"cnn",evidence:"not_reviewed"},{outlet:"Fox News",class:"fox",evidence:"not_reviewed"},{outlet:"Newsmax",class:"newsmax",evidence:"not_reviewed"}]};<\/script></div><!-- END: imagery -->
+<p><em>Demo of the evidence tiers using captions read on Oct. 1, 2026. No images were viewed.</em></p>`;
+const $=(s,r=document)=>r.querySelector(s),E=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const COL={reuters:'#e8731a',ap:'#555',cnn:'#cc0000',msnbc:'#6d3fc0',fox:'#003366',newsmax:'#b7791f'};
+const col=c=>COL[c]||'hsl('+([...String(c)].reduce((a,x)=>a+x.charCodeAt(0),0)*47%360)+',55%,42%)';
+const VC={'✅':'#15803d','❌':'#c62828','⚠':'#b7791f','❓':'#6b7280','⚖':'#1d4ed8'};
+function parse(src){const b={},re=/<!--\s*BEGIN:\s*([\w.\-]+)\s*-->([\s\S]*?)<!--\s*END:\s*\1\s*-->/g;let m,rest=src;while((m=re.exec(src))){b[m[1]]=m[2];rest=rest.replace(m[0],'')}return{b,rest}}
+const dom=h=>new DOMParser().parseFromString(h,'text/html').body;
+function clean(el){el.querySelectorAll('script,iframe,object,embed,style').forEach(n=>n.remove());el.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{if(/^on/i.test(a.name)||/^\s*javascript:/i.test(a.value))n.removeAttribute(a.name)}));return el}
+function runData(b){window.DATA={};Object.values(b).forEach(h=>{const re=/<script(?![^>]*json)[^>]*>([\s\S]*?)<\/script>/g;let m;while((m=re.exec(h))){try{const s=document.createElement('script');s.textContent=m[1];document.head.appendChild(s);s.remove()}catch(e){}}});return window.DATA}
+const card=(t,n,c)=>{const e=E('section','card '+(c||''));e.append(E('div','hdr',esc(t)));typeof n==='string'?e.append(E('div','',n)):e.append(n);return e};
+const det=(t,n,open)=>{const d=E('details');if(open)d.open=true;d.append(E('summary','',esc(t)));d.append(n);return d};
+function entries(el){const out=[];let cur=null;el.querySelectorAll('p').forEach(p=>{const l=p.querySelector('strong,em');if(!l)return;const k=l.textContent.replace(':','').trim().toLowerCase();const v=p.textContent.replace(l.textContent,'').trim();if(k==='claim'){cur={claim:v};out.push(cur)}else if(cur)cur[k]=v});return out}
+function fcList(el){const w=E('div');entries(el).forEach(e=>{const v=e.verdict||'';const c=VC[[...v][0]]||'#6b7280';w.append(E('div','fc','<b>'+esc(e.claim)+'</b><div class="sm">'+esc(e.origin||e.source||'')+'</div><span class="v" style="background:'+c+'">'+esc(v)+'</span><div>'+esc(e.rationale||'')+'</div>'))});return w}
+function credBars(s){const w=E('div');[...s].sort((a,b)=>b.score-a.score).forEach(o=>w.append(E('div','row','<span>'+esc(o.outlet)+'</span><div class="trk" role="img" aria-label="'+o.score+' of 100"><div class="grad"></div><div class="cov" style="width:'+(100-o.score)+'%"></div></div><b>'+o.score+'</b>')));return w}
+const GL={spin:['None','Minimal','Mild','Moderate','High','Severe'],factual:['Excellent','Very Good','Good','Fair','Poor','Very Poor']};GL.silence=GL.distortion=GL.spin;
+const lvl=(m,v)=>typeof v==='number'?Math.max(0,Math.min(5,m==='factual'?v-1:v)):GL[m].findIndex(w=>w.toLowerCase()===String(v).toLowerCase());
+const hue=l=>l<0?null:'hsl('+Math.round(125*(1-l/5))+',62%,78%)';
+function heat(cm){const M=[['spin','Spin'],['silence','Strategic Silence'],['distortion','Media Distortion'],['factual','Factual Integrity']];
+ const w=E('div'),sc=E('div','scroll'),t=E('table'),panel=E('div','panel');panel.style.display='none';
+ t.innerHTML='<thead><tr><th></th>'+M.map(m=>'<th>'+m[1]+'</th>').join('')+'</tr></thead>';const tb=E('tbody');
+ cm.rows.forEach(r=>{const tr=E('tr','','<td>'+esc(r.outlet)+'</td>');M.forEach(m=>{const l=lvl(m[0],r[m[0]]),word=l<0?String(r[m[0]]):GL[m[0]][l],td=E('td'),b=E('button','cell',esc(word));
+  b.style.background=hue(l)||'var(--trk)';if(l<0)b.title='Not in glossary';b.setAttribute('aria-pressed','false');
+  b.onclick=()=>{t.querySelectorAll('.cell').forEach(c=>c.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');const R=(cm.rationales||[]).find(q=>q.id===r.class),mm=R&&R.rationales.find(q=>q.metricId===m[0]);
+   panel.style.display='block';panel.innerHTML='<b>'+esc(r.outlet)+' — '+m[1]+': '+esc(word)+'</b>'+(mm?'<ul>'+mm.criteria.map(c=>'<li>'+esc(c)+'</li>').join('')+'</ul>':'<p class="sm">No rationale included for this cell.</p>')};
+  td.append(b);tr.append(td)});tb.append(tr)});
+ t.append(tb);sc.append(t);w.append(sc,panel,E('p','note','Green is better, red is worse, on every scale. Select a cell for the rationale.'));return w}
+const EV={viewed:['Viewed','#15803d'],caption:['Caption only','#b7791f'],not_reviewed:['Not reviewed','#6b7280']};
+function framing(recs){const w=E('div');recs.forEach(r=>{const ev=EV[r.evidence]||EV.not_reviewed,l=r.framing?lvl('spin',r.framing):-1,nr=!EV[r.evidence]||r.evidence==='not_reviewed';
+ let h='<b>'+esc(r.outlet)+'</b> <span class="v" style="background:'+ev[1]+'">'+ev[0]+'</span>';
+ if(nr)h+='<div class="sm">Imagery not reviewed for this story.</div>';
+ else h+='<div>'+(r.image_type?'<span class="tag">'+esc(String(r.image_type).replace(/_/g,' '))+'</span>':'')+(r.credit?'<span class="tag">'+esc(r.credit)+'</span>':'')+((r.same_source_as||[]).length?'<span class="tag">Same photo as '+esc(r.same_source_as.join(', '))+'</span>':'')+(l>=0?'<span class="tag" style="background:'+hue(l)+';color:#111">Framing: '+GL.spin[l]+'</span>':'')+'</div>'+(r.caption?'<div class="sm">Caption: '+esc(r.caption)+'</div>':'')+(r.evidence==='viewed'&&r.description?'<div>'+esc(r.description)+'</div>':'');
+ w.append(E('div','vf',h))});return w}
+function biasMap(B){const x0=76,x1=612,y0=44,y1=330,FS=24,X=l=>x0+(l-B.lean_min)/(B.lean_max-B.lean_min)*(x1-x0),Y=s=>y1-(s-B.str_min)/(B.str_max-B.str_min)*(y1-y0);
+ let s='<svg class="bm" viewBox="0 0 640 410" role="img" aria-label="Bias map: outlets by ideological lean and strength">';
+ for(let l=B.lean_min;l<=B.lean_max;l+=5)s+='<line x1="'+X(l)+'" x2="'+X(l)+'" y1="'+y0+'" y2="'+y1+'" stroke="'+(l===0?'#8892a2':'#c9cfd9')+'" stroke-width="'+(l===0?2:1)+'" stroke-dasharray="'+(l===0?0:'3 4')+'"/><text x="'+X(l)+'" y="'+(y1+30)+'" text-anchor="middle">'+l+'</text>';
+ for(let v=B.str_min;v<=B.str_max;v++)s+='<line x1="'+x0+'" x2="'+x1+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#c9cfd9" stroke-dasharray="3 4"/><text x="'+(x0-12)+'" y="'+(Y(v)+8)+'" text-anchor="end">'+v+'</text>';
+ s+='<text x="'+x0+'" y="402">◀ Left</text><text x="'+x1+'" y="402" text-anchor="end">Right ▶</text><text x="6" y="24">Strength</text>';
+ const pts=B.outlets.map(o=>({o,px:X(o.lean),py:Y(o.strength)})),boxes=[],R=13;
+ const ov=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+ const dots=pts.map(q=>({x:q.px-R,y:q.py-R,w:2*R,h:2*R}));
+ pts.forEach((q,qi)=>{const w=q.o.name.length*FS*0.6,h=FS,g=R+6,
+  C=[[q.px+g,q.py+8,'start'],[q.px-g,q.py+8,'end'],[q.px,q.py-g-4,'middle'],[q.px,q.py+g+h-4,'middle'],[q.px+g,q.py-h*0.6,'start'],[q.px-g,q.py-h*0.6,'end'],[q.px+g,q.py+h+2,'start'],[q.px-g,q.py+h+2,'end']];
+  const box=c=>({x:c[2]==='start'?c[0]:c[2]==='end'?c[0]-w:c[0]-w/2,y:c[1]-h+4,w,h:h});
+  const ok=c=>{const b=box(c);return b.x>=2&&b.x+b.w<=638&&b.y>=2&&b.y+b.h<=y1+34&&!boxes.some(k=>ov(b,k))&&!dots.some((d,di)=>di!==qi&&ov(b,d))&&!ov(b,dots[qi])};
+  const c=C.find(ok)||C[0];boxes.push(box(c));q.lx=c[0];q.ly=c[1];q.anchor=c[2]});
+ pts.forEach(q=>{const o=q.o;s+='<g><title>'+esc(o.name)+': lean '+o.lean+', strength '+o.strength+'</title><circle cx="'+q.px+'" cy="'+q.py+'" r="11" fill="'+col(o.class)+'" stroke="#fff" stroke-width="2.5"/><text x="'+q.lx+'" y="'+q.ly+'" text-anchor="'+q.anchor+'" style="fill:var(--fg);font-weight:700">'+esc(o.name)+'</text></g>'});
+ return E('div','',s+'</svg>')}
+function drift(D){const P=[];if(D.add_baseline)P.push({quote:D.baseline_quote,degree:0});(D.points||[]).forEach(p=>P.push(p));
+ const W=560,H=290,cx=W/2,cy=245,R=200,rd=d=>Math.PI/180*(180-d),xy=(r,d)=>[cx+r*Math.cos(rd(d)),cy-r*Math.sin(rd(d))],arc=(r,a,b)=>{const p=xy(r,a),q=xy(r,b);return'M'+p+'A'+r+' '+r+' 0 0 1 '+q};
+ let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Drift gauge"><defs><linearGradient id="gg"><stop offset="0" stop-color="#15803d"/><stop offset=".5" stop-color="#fde047"/><stop offset="1" stop-color="#e24a3b"/></linearGradient></defs><path d="'+arc(R,3,177)+'" fill="none" stroke="url(#gg)" stroke-width="16" stroke-linecap="round"/>';
+ for(let d=0;d<=180;d+=30){const a=xy(R-14,d),b=xy(R-24,d),t=xy(R-40,d);s+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="#8892a2" stroke-width="2"/><text x="'+t[0]+'" y="'+(t[1]+4)+'" text-anchor="middle">'+d+'°</text>'}
+ const last=P[P.length-1].degree,n=xy(R-70,last);s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+n[0]+'" y2="'+n[1]+'" stroke="var(--fg)" stroke-width="5" stroke-linecap="round"/><circle cx="'+cx+'" cy="'+cy+'" r="8" fill="var(--fg)"/>';
+ P.forEach((p,i)=>{const near=P.slice(0,i).filter(q=>Math.abs(q.degree-p.degree)<14).length,m=xy(R+near*30,p.degree);s+='<circle cx="'+m[0]+'" cy="'+m[1]+'" r="13" fill="#fff" stroke="#2b5ea7" stroke-width="2.5"/><text x="'+m[0]+'" y="'+(m[1]+4)+'" text-anchor="middle" style="fill:#2b5ea7;font-weight:700">'+(i+1)+'</text>'});
+ const band=last<30?'Minimal':last<60?'Mild':last<90?'Moderate':last<130?'Major':'Near-complete reversal';
+ s+='<text x="'+cx+'" y="'+(cy+34)+'" text-anchor="middle" style="fill:var(--fg);font-size:20px;font-weight:700">'+last+'° — '+band+' drift</text></svg>';
+ const w=E('div','',s);P.forEach((p,i)=>w.append(E('div','dq','<div class="dn">'+(i+1)+'</div><div><b>'+(i?'Current — '+p.degree+'°':'Baseline — 0°')+'</b><div>'+esc(p.quote||'')+'</div></div>')));return w}
+function render(src){const{b,rest}=parse(src),out=$('#out');out.innerHTML='';
+ if(!Object.keys(b).length){out.append(card('Nothing to render',E('p','','No blocks found. Wrap each section in <!-- BEGIN: id --> … <!-- END: id --> comments.')));return}
+ const D=runData(b),el=id=>b[id]?clean(dom(b[id]).firstElementChild||dom(b[id])):null,tx=id=>el(id)?el(id).textContent.trim():'';
+ out.append(E('h1','',esc(tx('headline')||'Untitled analysis')));if(tx('coverage-date'))out.append(E('p','date','Coverage as of '+esc(tx('coverage-date'))));
+ if(D.cred)out.append(E('div','chips',D.cred.scores.map(o=>'<span class="chip" style="background:'+col(o.class)+'">'+esc(o.outlet)+'</span>').join('')));
+ if(el('hero')){const f=el('hero'),im=f.querySelector('img'),cp=f.querySelector('figcaption'),u=im&&im.getAttribute('src')||'';if(/^https?:/.test(u)){const fg=E('figure'),i2=E('img');i2.alt=im.alt||'';i2.src=u;i2.onerror=()=>i2.replaceWith(E('p','note','Hero image could not be loaded here (remote images may be blocked). Source: '+esc(u)));fg.append(i2);if(cp)fg.append(E('figcaption','',esc(cp.textContent)));out.append(fg)}}
+ if(el('nr-body'))out.append(card('Baseline Record',el('nr-body')));
+ if(el('outlet-coverage'))out.append(card('Outlet Coverage',el('outlet-coverage')));
+ if(el('fc-claims')||el('fc-conspiracy')){const c=card('Fact Check',el('fc-claims')?fcList(el('fc-claims')):E('div'));if(el('fc-conspiracy'))c.append(det('Conspiracy Chatter',fcList(el('fc-conspiracy'))));out.append(c)}
+ if(el('hypocrisy')){const sv=(tx('hypocrisy').match(/Severity\s*(\d)/)||[])[1];out.append(card('Hypocrisy Call-Out'+(sv?' — Severity '+sv+' of 5':''),el('hypocrisy')))}
+ if(D.cred)out.append(card('Credibility Score',credBars(D.cred.scores)));
+ if(D.cm)out.append(card('Comparative Metrics',heat(D.cm)));
+ const dj=Object.keys(b).filter(k=>/drift/.test(k)).map(k=>/<script[^>]*json[^>]*>([\s\S]*?)<\/script>/.exec(b[k])).find(Boolean);
+ if(dj){try{const J=JSON.parse(dj[1]);out.append(card('Narrative Drift — '+(J.focus_actor||''),drift(J)))}catch(e){out.append(card('Narrative Drift',E('p','','The drift JSON could not be read: '+esc(e.message))))}}
+ if(D.bias)out.append(card('Bias Map',biasMap(D.bias)));
+ if(el('bias-notes'))out.append(card('Bias Notes',el('bias-notes')));
+ if(D.imagery&&D.imagery.records)out.append(card('Visual Framing',framing(D.imagery.records)));else if(el('imagery')){const c=card('Visual Framing',E('div'));c.lastChild.append(det('Imagery by outlet',el('imagery')));out.append(c)}
+ const n=/<p>[\s\S]*?<\/p>/.exec(rest);if(n)out.append(E('p','note',clean(dom(n[0])).textContent))}
+$('#go').onclick=()=>render($('#src').value);$('#smp').onclick=()=>{$('#src').value='';render(SAMPLE)};
+$('#smp2').onclick=()=>{$('#src').value='';render(SAMPLE2)};
+$('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('#src').value=r.result;render(r.result)};r.readAsText(f)};
+const STORY=`<!-- NEWS ANALYSIS -->
+<!-- SPEC VERSION: v2.7 (with the October 7 mirror test) -->
+<!-- STORY: The administration's taxpayer-funded TV ads praising Trump, his pledge to have MAGA Inc. pay going forward, and the White House statement that money already spent will not be repaid; coverage as of October 7, 2026 -->
+<!-- EVIDENCE NOTE: Outlet pages, images and text fields were collected by a Claude in Chrome session on October 7, 2026. Verbatim quotes come from that evidence and from ABC News and AP reporting. Fox News was dropped under the outlet rule: no foxnews.com or foxbusiness.com article on the ads was found in the past week, even though ABC News reported that at least one of the ads aired on Fox. Reuters and MSNOW published on October 5, before the White House said the spending would not be repaid. -->
+<!-- OMITTED BY GATE: hero (no image with clear permission for reuse), fc-conspiracy (no circulating narratives found), hypocrisy and drift (no documented contradiction at Severity 3 or higher). -->
+<!-- MIRROR TEST: applied to verdicts, metric words and scores; adopting the administration's "Patriotic Ads" label in a headline is scored the same as an outlet adopting a Democratic administration's branding would be. -->
+
+<!-- BEGIN: headline -->
+<div id="headline">
+  <p>Trump Says MAGA Inc. Will Pay for Taxpayer-Funded Ads Praising Him, as the White House Declines to Repay Money Already Spent</p>
+</div>
+<!-- END: headline -->
+
+<!-- BEGIN: coverage-date -->
+<div id="coverage-date">
+  <p>October 7, 2026</p>
+</div>
+<!-- END: coverage-date -->
+
+<!-- BEGIN: nr-body -->
+<div id="nr-body">
+  <p>The Trump administration has paid for a national television ad campaign praising the president and his policies, and on October 5 Trump said taxpayers would stop footing the bill. “I have decided to do the Patriotic Ads, among others, and pay for them myself, and with money I raised for MAGA, Inc.,” he wrote. MAGA Inc. is a super PAC that reported nearly $416 million in cash at the end of August.</p>
+  <p>The Department of Homeland Security set aside $20 million for the campaign; two Democratic senators said the money came from funds meant for Customs and Border Protection. AdImpact estimated that nearly $12 million in ads had aired. The spots carry a “Paid for by the U.S. Government” label, and one replays an ad from Trump’s 2024 campaign. On October 6 a White House official said Trump had “no plans to reimburse the federal government,” and Trump, asked about repayment, said, “We’ll decide.”</p>
+  <p>The White House and Vice President JD Vance defended the ads as “public service announcements” like those of past administrations. Ethics watchdogs and Democrats said they may violate a federal law barring appropriated money from being used for “publicity or propaganda.” Senate Minority Leader Chuck Schumer demanded repayment, Republican senators including Majority Leader John Thune said taxpayers should not pay, and California Attorney General Rob Bonta called the campaign a “staggering misuse of public funding and breach of public trust.” No court or auditor has ruled.</p>
+  <p><strong>Why it matters:</strong> The ads aired weeks before the midterm elections, and the dispute tests where government messaging ends and campaigning begins. Whether the money already spent will be repaid is unresolved.</p>
+</div>
+<!-- END: nr-body -->
+
+<!-- BEGIN: outlet-coverage -->
+<div id="outlet-coverage">
+  <ul>
+    <li><a href="https://www.newsmax.com/politics/trump-ads-maga-inc/2026/10/06/id/1271885/">Newsmax</a>: Runs wire copy headlined on the White House’s refusal to repay, using Trump’s “Patriotic Ads” label in the headline. It reports the legal scrutiny and the public-service defense but names no critics, gives no spending figure and describes none of the ads. Tone is straight news.</li>
+    <li><a href="https://www.reuters.com/world/us/trump-says-will-pay-tv-ads-after-pushback-over-taxpayer-funding-close-election-2026-10-05/">Reuters</a>: Published October 5, before the repayment question arose, and leads with Trump ending taxpayer funding. It adds the widest legal and regulatory context, including Bonta’s call for an investigation and the FCC chair’s refusal to open one, and notes that one ad closely resembles a 2024 campaign ad. Tone is straight news.</li>
+    <li><a href="https://apnews.com/article/trump-taxpayer-funded-ads-super-pac-reimburse-d728ad3cf091576d09a63d9218be3fe2">AP</a>: Leads with Trump not committing to repay and his “We’ll decide” answer, then gives AdImpact’s spending estimate, the source of the $20 million, criticism from Schumer and Republicans Thune and Britt, and a paragraph on the propaganda law. Tone is straight news, with “glorifying the president” as its one evaluative phrase.</li>
+    <li><a href="https://www.cnn.com/2026/10/05/politics/trump-taxpayer-funded-ads-super-pac">CNN</a>: Reports the switch to MAGA Inc. and the White House’s refusal to repay, and adds original reporting: it obtained 12 of at least 13 ads from the contractor and shows stills from two. It reports, in a straight-news tone, that Trump personally drove the campaign and that unnamed watchdogs see a clear violation.</li>
+    <li><a href="https://www.ms.now/news/trump-says-hell-personally-pay-for-taxpayer-funded-ads-after-bipartisan-backlash">MSNOW</a>: Published October 5 and centers the White House statement that MAGA Inc. will pay “moving forward,” noting it is unclear when taxpayer funding ends. It reports the CBP source of the money, named Republican critics Thune and Kennedy, and experts doubting the PSA comparison, in a straight-news tone that differs from the network’s related opinion pieces and videos calling the ads propaganda.</li>
+  </ul>
+</div>
+<!-- END: outlet-coverage -->
+
+<!-- BEGIN: fc-claims -->
+<div id="fc-claims">
+
+  <p><strong>Claim:</strong> Trump will pay for the ads himself.</p>
+  <p><strong>Origin:</strong> Trump, on Truth Social.</p>
+  <p><strong>Verdict:</strong> ⚠️ Misleading</p>
+  <p><em>Rationale:</em> The same post says the money will come from MAGA Inc., a super PAC funded by donors, and a White House official said only future ads are covered. Spending already made from taxpayer funds will not be repaid, according to the White House.</p>
+
+  <p><strong>Claim:</strong> The ads are public service announcements like those run by past administrations.</p>
+  <p><strong>Origin:</strong> The White House and Vice President JD Vance.</p>
+  <p><strong>Verdict:</strong> ⚠️ Misleading</p>
+  <p><em>Rationale:</em> Past administrations did run government-funded ads promoting programs. These spots center on Trump himself, AP reports that one replays a 2024 campaign ad, and ethics experts quoted by MSNOW doubt the comparison.</p>
+
+  <p><strong>Claim:</strong> The ad campaign violates the federal law against using appropriated money for publicity or propaganda.</p>
+  <p><strong>Origin:</strong> Ethics watchdogs and Democratic lawmakers, including Sen. Chuck Schumer.</p>
+  <p><strong>Verdict:</strong> ❓ Unsupported</p>
+  <p><em>Rationale:</em> Legal experts quoted by AP and CNN say the ads may violate the law, and the replayed campaign ad strengthens that case. No court, the Government Accountability Office or an inspector general has ruled, and it is unclear who has standing to sue, so a violation is not established.</p>
+
+  <p><strong>Claim:</strong> The Department of Homeland Security set aside $20 million for the campaign.</p>
+  <p><strong>Origin:</strong> Democratic senators, repeated across coverage.</p>
+  <p><strong>Verdict:</strong> ✅ True</p>
+  <p><em>Rationale:</em> All five outlets report the $20 million figure, attributed to Democratic lawmakers or reporting on the DHS contract. The claim that it came from Customs and Border Protection funds rests on two Democratic senators and has not been confirmed by DHS.</p>
+
+  <p><strong>Claim:</strong> Nearly $12 million in ads had already aired.</p>
+  <p><strong>Origin:</strong> AdImpact, an ad-tracking firm, as cited by AP.</p>
+  <p><strong>Verdict:</strong> ✅ True</p>
+  <p><em>Rationale:</em> CNN and MSNOW cite the same firm at about $10 million in their October 5 reports, and AP’s later figure is nearly $12 million. These are estimates of airtime, not government accounting, so the final cost is unknown.</p>
+
+</div>
+<!-- END: fc-claims -->
+
+<!-- BEGIN: credibility-score -->
+<div id="credibility-score">
+  <script>
+  window.DATA = window.DATA || {};
+  window.DATA.cred = {
+    scores: [
+      { outlet:"Newsmax", class:"newsmax", url:"https://www.newsmax.com/politics/trump-ads-maga-inc/2026/10/06/id/1271885/", score:77 },
+      { outlet:"Reuters", class:"reuters", url:"https://www.reuters.com/world/us/trump-says-will-pay-tv-ads-after-pushback-over-taxpayer-funding-close-election-2026-10-05/", score:89 },
+      { outlet:"AP",      class:"ap",      url:"https://apnews.com/article/trump-taxpayer-funded-ads-super-pac-reimburse-d728ad3cf091576d09a63d9218be3fe2", score:93 },
+      { outlet:"CNN",     class:"cnn",     url:"https://www.cnn.com/2026/10/05/politics/trump-taxpayer-funded-ads-super-pac", score:89 },
+      { outlet:"MSNOW",   class:"msnow",   url:"https://www.ms.now/news/trump-says-hell-personally-pay-for-taxpayer-funded-ads-after-bipartisan-backlash", score:87 }
+    ]
+  };
+  <\/script>
+</div>
+<!-- END: credibility-score -->
+
+<!-- BEGIN: comparative-metrics -->
+<div id="comparative-metrics">
+  <table>
+    <thead><tr><th>Outlet</th><th>Spin</th><th>Strategic Silence</th><th>Media Distortion</th><th>Factual Integrity</th></tr></thead>
+    <tbody>
+      <tr><td>Newsmax</td><td>Mild</td><td>Moderate</td><td>Minimal</td><td>Good</td></tr>
+      <tr><td>Reuters</td><td>Minimal</td><td>Minimal</td><td>None</td><td>Very Good</td></tr>
+      <tr><td>AP</td><td>Minimal</td><td>None</td><td>None</td><td>Excellent</td></tr>
+      <tr><td>CNN</td><td>Minimal</td><td>Minimal</td><td>None</td><td>Very Good</td></tr>
+      <tr><td>MSNOW</td><td>Minimal</td><td>Minimal</td><td>None</td><td>Very Good</td></tr>
+    </tbody>
+  </table>
+  <script>
+  window.DATA = window.DATA || {};
+  window.DATA.cm = {
+    rows: [
+      { outlet:"Newsmax", class:"newsmax", url:"https://www.newsmax.com/politics/trump-ads-maga-inc/2026/10/06/id/1271885/", spin:"Mild",    silence:"Moderate", distortion:"Minimal", factual:"Good" },
+      { outlet:"Reuters", class:"reuters", url:"https://www.reuters.com/world/us/trump-says-will-pay-tv-ads-after-pushback-over-taxpayer-funding-close-election-2026-10-05/", spin:"Minimal", silence:"Minimal",  distortion:"None",    factual:"Very Good" },
+      { outlet:"AP",      class:"ap",      url:"https://apnews.com/article/trump-taxpayer-funded-ads-super-pac-reimburse-d728ad3cf091576d09a63d9218be3fe2", spin:"Minimal", silence:"None",     distortion:"None",    factual:"Excellent" },
+      { outlet:"CNN",     class:"cnn",     url:"https://www.cnn.com/2026/10/05/politics/trump-taxpayer-funded-ads-super-pac", spin:"Minimal", silence:"Minimal",  distortion:"None",    factual:"Very Good" },
+      { outlet:"MSNOW",   class:"msnow",   url:"https://www.ms.now/news/trump-says-hell-personally-pay-for-taxpayer-funded-ads-after-bipartisan-backlash", spin:"Minimal", silence:"Minimal",  distortion:"None",    factual:"Very Good" }
+    ],
+    rationales: [
+      { id:"newsmax", label:"Newsmax", rationales:[
+        { metricId:"spin", title:"Spin", criteria:["Uses the administration’s “Patriotic Ads” label in its headline; other outlets use it only inside quotation marks or attributed to Trump."] },
+        { metricId:"silence", title:"Strategic Silence", criteria:["Names no critic, though Republican senators spoke on the record.","Gives no spending figure (“estimates vary”) and does not describe the ads’ content or the replayed campaign ad."] },
+        { metricId:"distortion", title:"Media Distortion", criteria:["The headline reports the refusal to repay accurately; the thin context, not misstatement, shapes the impression."] },
+        { metricId:"factual", title:"Factual Integrity", criteria:["What it reports matches other outlets.","Its “more than $20 million” is less precise than the $20 million others report."] }
+      ]},
+      { id:"reuters", label:"Reuters", rationales:[
+        { metricId:"spin", title:"Spin", criteria:["The headline’s “ads that praised him” is a fair description; “propaganda” appears only as critics’ concern."] },
+        { metricId:"silence", title:"Strategic Silence", criteria:["Does not cover the refusal to repay, which came after publication; otherwise it includes critics, the White House view and regulators."] },
+        { metricId:"distortion", title:"Media Distortion", criteria:["No distortion found; the headline matches what Trump announced that day."] },
+        { metricId:"factual", title:"Factual Integrity", criteria:["Attributes the $20 million to Democratic lawmakers rather than stating it as fact.","Names its sources for the replayed-ad and budget-director reports."] }
+      ]},
+      { id:"ap", label:"AP", rationales:[
+        { metricId:"spin", title:"Spin", criteria:["Mostly descriptive, but calls the ads “glorifying the president” in its own voice."] },
+        { metricId:"silence", title:"Strategic Silence", criteria:["No meaningful omissions found: repayment, Trump’s own answer, spending, the funding source, the law, the White House defense, and Democratic and Republican critics are all present."] },
+        { metricId:"distortion", title:"Media Distortion", criteria:["No distortion found; the headline’s “doesn’t commit” matches Trump’s “We’ll decide.”"] },
+        { metricId:"factual", title:"Factual Integrity", criteria:["Every figure is attributed, and the legal paragraph cites the statute’s wording.","Reports a fifth ad that began airing Tuesday, a detail no other outlet had."] }
+      ]},
+      { id:"cnn", label:"CNN", rationales:[
+        { metricId:"spin", title:"Spin", criteria:["The headline’s “campaign-style ads” is a characterization, though a widely used one; the body attributes the violation claim to watchdogs."] },
+        { metricId:"silence", title:"Strategic Silence", criteria:["Includes the refusal to repay and the White House defense, but its critics are unnamed (“watchdogs,” “Republicans and Democrats alike”)."] },
+        { metricId:"distortion", title:"Media Distortion", criteria:["No distortion found; the ad stills it shows come from the campaign itself and are labeled as obtained by CNN."] },
+        { metricId:"factual", title:"Factual Integrity", criteria:["Original reporting on 12 of at least 13 ads, obtained from the contractor.","Gives a dated AdImpact figure ($10.1 million as of Monday)."] }
+      ]},
+      { id:"msnow", label:"MSNOW", rationales:[
+        { metricId:"spin", title:"Spin", criteria:["The news article uses neutral labels; “propaganda” appears in the network’s separate opinion pieces and video titles, not in this report."] },
+        { metricId:"silence", title:"Strategic Silence", criteria:["Published before the refusal to repay, it notes the open question of when taxpayer funding ends; it quotes named Republican critics and the White House defense."] },
+        { metricId:"distortion", title:"Media Distortion", criteria:["No distortion found; the headline matches the White House statement that day."] },
+        { metricId:"factual", title:"Factual Integrity", criteria:["Gives sources for each figure, including the FEC for MAGA Inc.’s cash.","Attributes the CBP funding source rather than stating it as fact."] }
+      ]}
+    ]
+  };
+  <\/script>
+</div>
+<!-- END: comparative-metrics -->
+
+<!-- BEGIN: bias-map -->
+<div id="bias-map">
+  <script>
+  window.DATA = window.DATA || {};
+  window.DATA.bias = {
+    lean_min:-10,
+    lean_max:10,
+    str_min:0,
+    str_max:5,
+    outlets:[
+      {name:"Newsmax", class:"newsmax", url:"https://www.newsmax.com/politics/trump-ads-maga-inc/2026/10/06/id/1271885/", lean:1.6,  strength:1.3},
+      {name:"Reuters", class:"reuters", url:"https://www.reuters.com/world/us/trump-says-will-pay-tv-ads-after-pushback-over-taxpayer-funding-close-election-2026-10-05/", lean:-0.4, strength:0.5},
+      {name:"AP",      class:"ap",      url:"https://apnews.com/article/trump-taxpayer-funded-ads-super-pac-reimburse-d728ad3cf091576d09a63d9218be3fe2", lean:-0.6, strength:0.6},
+      {name:"CNN",     class:"cnn",     url:"https://www.cnn.com/2026/10/05/politics/trump-taxpayer-funded-ads-super-pac", lean:-1.0, strength:0.9},
+      {name:"MSNOW",   class:"msnow",   url:"https://www.ms.now/news/trump-says-hell-personally-pay-for-taxpayer-funded-ads-after-bipartisan-backlash", lean:-0.8, strength:0.7}
+    ]
+  };
+  <\/script>
+</div>
+<!-- END: bias-map -->
+
+<!-- BEGIN: bias-notes -->
+<div id="bias-notes">
+  <ul>
+    <li>Newsmax: Its headline reports the refusal to repay, which cuts against the administration, but it adopts the “Patriotic Ads” label and leaves out the critics, the spending and the ads’ content; it sits right of the group with mild strength.</li>
+    <li>Reuters: Straight reporting with the broadest legal and regulatory context and a neutral photo of Trump on the South Lawn; it sits near the center.</li>
+    <li>AP: The most complete account, balancing the White House defense with Democratic and Republican critics; “glorifying the president” is its one evaluative phrase, tilting it slightly left.</li>
+    <li>CNN: Its stills of a lion and of Trump striding into a colonnade show the ads’ most self-promotional imagery, and it reports that Trump personally drove the campaign, which puts it slightly further left than the wires.</li>
+    <li>MSNOW: The news article is measured and quotes Republican critics by name, while the network’s related opinion and video coverage calls the ads propaganda; the article alone sits slightly left.</li>
+  </ul>
+</div>
+<!-- END: bias-notes -->
+
+<!-- BEGIN: imagery -->
+<div id="imagery">
+  <script>
+  window.DATA = window.DATA || {};
+  window.DATA.imagery = { records: [
+    { outlet:"Newsmax", class:"newsmax", url:"https://www.newsmax.com/politics/trump-ads-maga-inc/2026/10/06/id/1271885/", evidence:"viewed", image_type:"video_thumbnail", caption:"No caption shown; still frame of the lead video.", same_source_as:[], framing:"None", description:"The still shows three anchors at a news desk with a Capitol backdrop and “NATIONAL REPORT” lettering. It does not show Trump or the ads, and the video did not play." },
+    { outlet:"Reuters", class:"reuters", url:"https://www.reuters.com/world/us/trump-says-will-pay-tv-ads-after-pushback-over-taxpayer-funding-close-election-2026-10-05/", evidence:"viewed", image_type:"scene", credit:"REUTERS/Eric Lee", caption:"Trump speaks with media before boarding Marine One on the South Lawn, October 5, 2026.", same_source_as:[], framing:"None", description:"Trump with arms spread, talking to reporters in front of microphones, with the White House portico and a construction crane behind him. A daytime news photo from the day of the announcement." },
+    { outlet:"AP", class:"ap", url:"https://apnews.com/article/trump-taxpayer-funded-ads-super-pac-reimburse-d728ad3cf091576d09a63d9218be3fe2", evidence:"viewed", image_type:"scene", credit:"AP Photo/Jose Luis Magana", caption:"Trump gestures to reporters on the South Lawn upon his arrival at the White House, Oct. 5, 2026.", same_source_as:[], framing:"Minimal", description:"Trump in a dark overcoat raising a clenched fist toward the camera against a very dark, blurred night background. The tight crop and dark setting make it a more dramatic image than the other South Lawn photos." },
+    { outlet:"CNN", class:"cnn", url:"https://www.cnn.com/2026/10/05/politics/trump-taxpayer-funded-ads-super-pac", evidence:"viewed", image_type:"scene", credit:"Anna Moneymaker/Getty Images", caption:"Trump speaks to reporters on the South Lawn on October 5, 2026.", same_source_as:[], framing:"Minimal", description:"The lead is a profile of Trump against a bright blue sky. Two stills from the government ads follow: a male lion on a grassy plain with a “Paid for by the U.S. Government” label, and Trump’s silhouette walking from a dark doorway into a bright colonnade." },
+    { outlet:"MSNOW", class:"msnow", url:"https://www.ms.now/news/trump-says-hell-personally-pay-for-taxpayer-funded-ads-after-bipartisan-backlash", evidence:"viewed", image_type:"video_thumbnail", caption:"No caption shown; the in-page lead is a video about how the ads are funded.", same_source_as:[], framing:"None", description:"The preview image is a shoulders-up profile of Trump, his hair blown by wind, against a pale sky. The in-page video did not play, and the article shows no ad stills." }
+  ]};
+  <\/script>
+</div>
+<!-- END: imagery -->
+`;
+render(STORY);
+</script>
+</body>
+</html>
