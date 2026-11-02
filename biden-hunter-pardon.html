@@ -430,7 +430,7 @@ function render(src){const{b,rest}=parse(src),out=$('#out');out.innerHTML='';
  if(el('fc-claims')||el('fc-conspiracy')){const c=card('Fact Check',el('fc-claims')?fcList(el('fc-claims')):E('div'));if(el('fc-conspiracy'))c.append(det('Conspiracy Chatter',fcList(el('fc-conspiracy'))));out.append(c)}
  if(D.cred)out.append(card('Credibility Score',ncCred(credBars(D.cred.scores),NC)));
  if(D.cm)out.append(card(ST['comparative-metrics'],ncHeat(heat(D.cm),NC)));
- if(el('hypocrisy')){const sv=(tx('hypocrisy').match(/Severity\s*(\d)/)||[])[1];out.append(card('Hypocrisy Call-Out'+(sv?' — Severity '+sv+' of 5':''),el('hypocrisy')))}
+ if(el('hypocrisy')){const sv=(tx('hypocrisy').match(/Severity\s*(\d)/)||[])[1];out.append(card('🤔 Hypocrisy Call-Out'+(sv?' — Severity '+sv+' of 5':''),el('hypocrisy')))}
  const dj=Object.keys(b).filter(k=>/drift/.test(k)).map(k=>/<script[^>]*json[^>]*>([\s\S]*?)<\/script>/.exec(b[k])).find(Boolean);
  if(dj){try{const J=JSON.parse(dj[1]);out.append(card('Narrative Drift — '+(J.focus_actor||''),drift(J)))}catch(e){out.append(card('Narrative Drift',E('p','','The drift JSON could not be read: '+esc(e.message))))}}
  if(D.bias){const bm=card('Bias Map',biasMap(D.bias)),bb=bm.lastChild;if(D.lean&&D.lean.outlets){if(D.lean.summary)bb.prepend(E('p','',esc(D.lean.summary)));bb.append(det('Signs of tilt, outlet by outlet',leanBlock(D.lean,D)))}if(NC.length)bb.append(E('p','note','Not placed on the map: '+NC.map(o=>esc(o.outlet)+' ('+esc(ncK(o).chip_suffix)+')').join(', ')+'.'));out.append(bm)}
