@@ -65,7 +65,7 @@ button.b.g{background:var(--trk);color:var(--fg)}.note{color:var(--mut);font-siz
 <div><p class="note">Paste a v2.6, v2.7 or v2.8 fragment (blocks wrapped in BEGIN/END comments) or choose a file. Nothing leaves your browser.</p>
 <textarea id="src" aria-label="Analysis fragment"></textarea><br>
 <input type="file" id="file" accept=".html,.htm,.txt">
-<br><button class="b" id="go">Render</button><button class="b g" id="smpl">Brad Lander detained in the West Bank</button><button class="b g" id="smpcr">Judge Carter's ruling on California ballots</button><button class="b g" id="smppl">Peltola campaign and the second Dan Sullivan</button><button class="b g" id="smphb">Biden pardons his son Hunter (2024)</button><button class="b g" id="smpnc">DOJ noncitizen-voter list</button><button class="b g" id="smpfr">Trump blames immigration for unrest in France</button><button class="b g" id="smpf">Trump blames Zelenskyy for diesel prices</button><button class="b g" id="smpd">DOJ probe of TV networks</button><button class="b g" id="smpz">Mamdani and ICE shooting (current)</button><button class="b g" id="smpm">Medicare payments sample</button><button class="b g" id="smpa">Taxpayer ads sample</button><button class="b g" id="smp">Powell sample</button><button class="b g" id="smpk">Pike sample</button><button class="b g" id="smp2">Older v2.6 sample (hypocrisy and drift)</button></div></details>
+<br><button class="b" id="go">Render</button><button class="b g" id="smpl">Brad Lander detained in the West Bank</button><button class="b g" id="smpcr">Judge Carter's ruling on California ballots</button><button class="b g" id="smppl">Peltola campaign and the second Dan Sullivan</button><button class="b g" id="smphb">Biden pardons his son Hunter (2024)</button><button class="b g" id="smpzh">Trump pardons Binance founder Zhao (2025)</button><button class="b g" id="smpnc">DOJ noncitizen-voter list</button><button class="b g" id="smpfr">Trump blames immigration for unrest in France</button><button class="b g" id="smpf">Trump blames Zelenskyy for diesel prices</button><button class="b g" id="smpd">DOJ probe of TV networks</button><button class="b g" id="smpz">Mamdani and ICE shooting (current)</button><button class="b g" id="smpm">Medicare payments sample</button><button class="b g" id="smpa">Taxpayer ads sample</button><button class="b g" id="smp">Powell sample</button><button class="b g" id="smpk">Pike sample</button><button class="b g" id="smp2">Older v2.6 sample (hypocrisy and drift)</button></div></details>
 </div>
 <script>
 const SAMPLE_OLD=``;
@@ -226,7 +226,7 @@ const SAMPLE_HUNTER=`<!-- NEWS ANALYSIS -->
   },
   {
    "quote": "December 1, 2024: “Today, I signed a pardon for my son Hunter.”",
-   "degree": 170
+   "degree": 180
   }
  ]
 }
@@ -284,6 +284,7 @@ const SAMPLE_HUNTER=`<!-- NEWS ANALYSIS -->
 </div>
 <!-- END: imagery -->
 `;
+const SAMPLE_ZHAO=``;
 const SAMPLE_NONCIT=``;
 const SAMPLE_FRANCE=``;
 const SAMPLE_FUEL=``;
@@ -427,9 +428,9 @@ function render(src){const{b,rest}=parse(src),out=$('#out');out.innerHTML='';
  if(el('nr-body')){const bc=card(ST['nr-body'],el('nr-body')),DL=CONTRACT.dropdown_labels;if(el('historical-context'))bc.append(det(DL['historical-context'],el('historical-context')));if(el('outlet-coverage')){const oc=el('outlet-coverage');((D.cred&&D.cred.scores)||[]).filter(o=>wireTxt(o)||viaTxt(o)||typeTxt(o)||placeOf(D,o)).forEach(o=>oc.querySelectorAll('li').forEach(li=>{const a=li.querySelector('a');if(a&&a.textContent.trim()===o.outlet)li.insertAdjacentHTML('beforeend',[wireTxt(o),viaTxt(o),typeTxt(o),placeOf(D,o)].filter(Boolean).map(t=>' <span class="tag wt2">'+esc(t)+'</span>').join(''))}));liRank(oc);if(D.placement&&D.placement.checked_at)oc.append(E('p','note','Homepages checked '+esc(D.placement.checked_at)+'. '+esc(CONTRACT.placement.note)));bc.append(det(DL['outlet-coverage'],ncOC(oc,NC)))}if(D.network&&D.network.outlets)bc.append(det(DL['network-coverage'],netList(D.network)));if(D.coverage&&D.coverage.facts){const nm={};((D.cm&&D.cm.rows)||[]).forEach(r=>nm[r.class]=r.outlet);D.coverage._nc=NC;bc.append(det(DL['coverage-grid'],covGrid(D.coverage,nm)))}out.append(bc)}else if(el('outlet-coverage'))out.append(card('Outlet Coverage',el('outlet-coverage')));
  if(NC.length)out.append(card(ncTitle(NC),ncList(NC)));
  if(el('fc-claims')||el('fc-conspiracy')){const c=card('Fact Check',el('fc-claims')?fcList(el('fc-claims')):E('div'));if(el('fc-conspiracy'))c.append(det('Conspiracy Chatter',fcList(el('fc-conspiracy'))));out.append(c)}
- if(el('hypocrisy')){const sv=(tx('hypocrisy').match(/Severity\s*(\d)/)||[])[1];out.append(card('Hypocrisy Call-Out'+(sv?' — Severity '+sv+' of 5':''),el('hypocrisy')))}
  if(D.cred)out.append(card('Credibility Score',ncCred(credBars(D.cred.scores),NC)));
  if(D.cm)out.append(card(ST['comparative-metrics'],ncHeat(heat(D.cm),NC)));
+ if(el('hypocrisy')){const sv=(tx('hypocrisy').match(/Severity\s*(\d)/)||[])[1];out.append(card('Hypocrisy Call-Out'+(sv?' — Severity '+sv+' of 5':''),el('hypocrisy')))}
  const dj=Object.keys(b).filter(k=>/drift/.test(k)).map(k=>/<script[^>]*json[^>]*>([\s\S]*?)<\/script>/.exec(b[k])).find(Boolean);
  if(dj){try{const J=JSON.parse(dj[1]);out.append(card('Narrative Drift — '+(J.focus_actor||''),drift(J)))}catch(e){out.append(card('Narrative Drift',E('p','','The drift JSON could not be read: '+esc(e.message))))}}
  if(D.bias){const bm=card('Bias Map',biasMap(D.bias)),bb=bm.lastChild;if(D.lean&&D.lean.outlets){if(D.lean.summary)bb.prepend(E('p','',esc(D.lean.summary)));bb.append(det('Signs of tilt, outlet by outlet',leanBlock(D.lean,D)))}if(NC.length)bb.append(E('p','note','Not placed on the map: '+NC.map(o=>esc(o.outlet)+' ('+esc(ncK(o).chip_suffix)+')').join(', ')+'.'));out.append(bm)}
@@ -441,6 +442,7 @@ $('#smpl').onclick=()=>{$('#src').value='';render(SAMPLE_LANDER)};
 $('#smpcr').onclick=()=>{$('#src').value='';render(SAMPLE_CARULING)};
 $('#smppl').onclick=()=>{$('#src').value='';render(SAMPLE_PELTOLA)};
 $('#smphb').onclick=()=>{$('#src').value='';render(SAMPLE_HUNTER)};
+$('#smpzh').onclick=()=>{$('#src').value='';render(SAMPLE_ZHAO)};
 $('#smpz').onclick=()=>{$('#src').value='';render(SAMPLE_MAM)};
 $('#smpnc').onclick=()=>{$('#src').value='';render(SAMPLE_NONCIT)};
 $('#smpfr').onclick=()=>{$('#src').value='';render(SAMPLE_FRANCE)};
