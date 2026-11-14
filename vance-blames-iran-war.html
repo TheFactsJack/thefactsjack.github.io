@@ -65,7 +65,7 @@ button.b.g{background:var(--trk);color:var(--fg)}.note{color:var(--mut);font-siz
 <div><p class="note">Paste a v2.6, v2.7 or v2.8 fragment (blocks wrapped in BEGIN/END comments) or choose a file. Nothing leaves your browser.</p>
 <textarea id="src" aria-label="Analysis fragment"></textarea><br>
 <input type="file" id="file" accept=".html,.htm,.txt">
-<br><button class="b" id="go">Render</button><button class="b g" id="smpl">Brad Lander detained in the West Bank</button><button class="b g" id="smpcr">Judge Carter's ruling on California ballots</button><button class="b g" id="smppl">Peltola campaign and the second Dan Sullivan</button><button class="b g" id="smphb">Biden pardons his son Hunter (2024)</button><button class="b g" id="smpzh">Trump pardons Binance founder Zhao (2025)</button><button class="b g" id="smpmi">Stevens endorses Rogers in Michigan</button><button class="b g" id="smpak">Alaska suit dismissed</button><button class="b g" id="smpva">Vance blames Iran war</button><button class="b g" id="smpnc">DOJ noncitizen-voter list</button><button class="b g" id="smpfr">Trump blames immigration for unrest in France</button><button class="b g" id="smpf">Trump blames Zelenskyy for diesel prices</button><button class="b g" id="smpd">DOJ probe of TV networks</button><button class="b g" id="smpz">Mamdani and ICE shooting (current)</button><button class="b g" id="smpm">Medicare payments sample</button><button class="b g" id="smpa">Taxpayer ads sample</button><button class="b g" id="smp">Powell sample</button><button class="b g" id="smpk">Pike sample</button><button class="b g" id="smp2">Older v2.6 sample (hypocrisy and drift)</button></div></details>
+<br><button class="b" id="go">Render</button><button class="b g" id="smpl">Brad Lander detained in the West Bank</button><button class="b g" id="smpcr">Judge Carter's ruling on California ballots</button><button class="b g" id="smppl">Peltola campaign and the second Dan Sullivan</button><button class="b g" id="smphb">Biden pardons his son Hunter (2024)</button><button class="b g" id="smpzh">Trump pardons Binance founder Zhao (2025)</button><button class="b g" id="smpmi">Stevens endorses Rogers in Michigan</button><button class="b g" id="smpak">Alaska suit dismissed</button><button class="b g" id="smpva">Vance blames Iran war</button><button class="b g" id="smpdw">White House warns Democrats over investigations</button><button class="b g" id="smpnc">DOJ noncitizen-voter list</button><button class="b g" id="smpfr">Trump blames immigration for unrest in France</button><button class="b g" id="smpf">Trump blames Zelenskyy for diesel prices</button><button class="b g" id="smpd">DOJ probe of TV networks</button><button class="b g" id="smpz">Mamdani and ICE shooting (current)</button><button class="b g" id="smpm">Medicare payments sample</button><button class="b g" id="smpa">Taxpayer ads sample</button><button class="b g" id="smp">Powell sample</button><button class="b g" id="smpk">Pike sample</button><button class="b g" id="smp2">Older v2.6 sample (hypocrisy and drift)</button></div></details>
 </div>
 <script>
 const SAMPLE_OLD=``;
@@ -296,6 +296,7 @@ const SAMPLE_VANCE=`<!-- NEWS ANALYSIS -->
 </div>
 <!-- END: imagery -->
 `;
+const SAMPLE_DOJWARN=``;
 const SAMPLE_NONCIT=``;
 const SAMPLE_FRANCE=``;
 const SAMPLE_FUEL=``;
@@ -429,7 +430,7 @@ function drift(D){const P=[];if(D.add_baseline)P.push({quote:D.baseline_quote,de
  P.forEach((p,i)=>{const near=P.slice(0,i).filter(q=>Math.abs(q.degree-p.degree)<14).length,m=xy(R+near*30,p.degree);s+='<circle cx="'+m[0]+'" cy="'+m[1]+'" r="13" fill="#fff" stroke="#2b5ea7" stroke-width="2.5"/><text x="'+m[0]+'" y="'+(m[1]+4)+'" text-anchor="middle" style="fill:#2b5ea7;font-weight:700">'+(i+1)+'</text>'});
  const HY=CONTRACT.hypocrisy,sev=Object.keys(HY.severity_to_degrees).find(k=>last>=HY.severity_to_degrees[k][0]&&last<=HY.severity_to_degrees[k][1])||'1',band='Severity '+sev+': '+HY.severity_names[sev];
  s+='<text x="'+cx+'" y="'+(cy+34)+'" text-anchor="middle" style="fill:var(--fg);font-size:20px;font-weight:700">'+last+'° — '+band+'</text></svg>';
- const w=E('div','',s);P.forEach((p,i)=>w.append(E('div','dq','<div class="dn">'+(i+1)+'</div><div><b>'+(i?'Current — '+p.degree+'°':'Baseline — 0°')+'</b><div>'+esc(p.quote||'')+'</div></div>')));return w}
+ const w=E('div','',s);P.forEach((p,i)=>w.append(E('div','dq','<div class="dn">'+(i+1)+'</div><div><b>'+(i?(i===P.length-1?'Current — ':'Earlier — ')+p.degree+'°':'Baseline — 0°')+'</b><div>'+esc(p.quote||'')+'</div></div>')));return w}
 function render(src){const{b,rest}=parse(src),out=$('#out');out.innerHTML='';
  if(!Object.keys(b).length){out.append(card('Nothing to render',E('p','','No blocks found. Wrap each section in <!-- BEGIN: id --> … <!-- END: id --> comments.')));return}
  const D=runData(b);setRank(D);const el=id=>b[id]?clean(dom(b[id]).firstElementChild||dom(b[id])):null,tx=id=>el(id)?el(id).textContent.trim():'';
@@ -457,6 +458,7 @@ $('#smpzh').onclick=()=>{$('#src').value='';render(SAMPLE_ZHAO)};
 $('#smpmi').onclick=()=>{$('#src').value='';render(SAMPLE_MICH)};
 $('#smpak').onclick=()=>{$('#src').value='';render(SAMPLE_ALASKA)};
 $('#smpva').onclick=()=>{$('#src').value='';render(SAMPLE_VANCE)};
+$('#smpdw').onclick=()=>{$('#src').value='';render(SAMPLE_DOJWARN)};
 $('#smpz').onclick=()=>{$('#src').value='';render(SAMPLE_MAM)};
 $('#smpnc').onclick=()=>{$('#src').value='';render(SAMPLE_NONCIT)};
 $('#smpfr').onclick=()=>{$('#src').value='';render(SAMPLE_FRANCE)};
